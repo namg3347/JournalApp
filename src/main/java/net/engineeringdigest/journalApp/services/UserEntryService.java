@@ -7,13 +7,13 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.engineeringdigest.journalApp.entities.User;
 import net.engineeringdigest.journalApp.repository.UserRepo;
 
-@Component
+@Service
 @Slf4j
 public class UserEntryService {
 

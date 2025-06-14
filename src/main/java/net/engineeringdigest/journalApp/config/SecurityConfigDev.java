@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import lombok.RequiredArgsConstructor;
 import net.engineeringdigest.journalApp.services.UserDetailsServiceImpl;
 
-@Configuration
+@Configuration // tells @conponentScan that this is a component that can be used by spring ioc
 @EnableWebSecurity
 @RequiredArgsConstructor
 //@Profile("dev") beans can be made using profiles, if profile is dev then it only work for dev env

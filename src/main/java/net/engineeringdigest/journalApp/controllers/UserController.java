@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import net.engineeringdigest.journalApp.entities.JournalEntry;
 import net.engineeringdigest.journalApp.entities.User;
+import net.engineeringdigest.journalApp.responseApi.WeatherResponse;
 import net.engineeringdigest.journalApp.services.JournalEntryService;
 import net.engineeringdigest.journalApp.services.UserEntryService;
+import net.engineeringdigest.journalApp.services.WeatherService;
 
 @RestController
 @RequestMapping("/user")
@@ -29,12 +32,22 @@ public class UserController {
     @Autowired
     private JournalEntryService journalEntryService;
 
-    // @GetMapping("/id/{myid}")
-    // public ResponseEntity<?> getUserByID(@PathVariable ObjectId myid) {
-    // Optional<User> user = userEntryService.getById(myid);
-    // if(user.isPresent()) return new ResponseEntity<>(user,HttpStatus.OK);
-    // else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    // }
+    @Autowired
+    private WeatherService weatherService;
+
+    @GetMapping
+    public ResponseEntity<?> greeting() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        WeatherResponse response = weatherService.getWeather("mumbai");
+        String greeting = "";
+        if(response!=null) {
+            int temp = response.getCurrent().getFeelslike();
+            String airQuality = response.getCurrent().getAirQuality().getPm25();
+            greeting = "It feels like "+temp+" Calcius and the air quality is "+airQuality+" pm2.5.";
+        }
+        return new ResponseEntity<>("hi there "+username+"!\n"+greeting,HttpStatus.OK);
+   
+    }
 
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User user) {

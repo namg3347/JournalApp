@@ -17,14 +17,12 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
 import net.engineeringdigest.journalApp.entities.User;
 import net.engineeringdigest.journalApp.repository.UserRepo;
 
 @SpringBootTest
 // @ActiveProfiles("dev")
-public class UserEntryServiceTests {
+class UserEntryServiceTests {
 
     @Autowired
     private UserRepo userRepo;
@@ -37,7 +35,7 @@ public class UserEntryServiceTests {
     
     @Test
     @Disabled
-    public void testFindUserByUsername() {
+    void testFindUserByUsername() {
         assertNotNull(userRepo.findByUserName("ram"));
     }
 
@@ -48,14 +46,14 @@ public class UserEntryServiceTests {
         "shayam",
         "naman"
     })
-    public void testFindUserByUsername2(String username) {
+     void testFindUserByUsername2(String username) {
         assertNotNull(userRepo.findByUserName(username),"this is false "+username);
     }
 
     @ParameterizedTest
     @Disabled
     @ArgumentsSource(UserArgumentProvider.class)
-    public void testSaveNewUser(User user) {
+     void testSaveNewUser(User user) {
         // assertNotNull(user);
         assertTrue(userEntryService.saveNewUser(user));
     }
@@ -69,7 +67,7 @@ public class UserEntryServiceTests {
         "1,6,3",
         "34,63,12"
     })
-    public void adder(int a,int b,int expected) {
+     void adder(int a,int b,int expected) {
         assertEquals(expected, a+b);
     }
 

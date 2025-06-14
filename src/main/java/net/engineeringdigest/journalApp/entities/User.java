@@ -30,6 +30,8 @@ public class User {
     private String userName;
     @NonNull
     private String password;
+    private String email;
+    private boolean sentimentAnalysis;
     @DBRef//creates a reference of journal entries into users ie their id used to refrence the entries into a perticular user
     private List<JournalEntry> journalEntries = new ArrayList<>();
     private List<String> roles;

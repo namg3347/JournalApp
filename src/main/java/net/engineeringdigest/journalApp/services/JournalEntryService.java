@@ -6,14 +6,14 @@ import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import net.engineeringdigest.journalApp.entities.JournalEntry;
 import net.engineeringdigest.journalApp.entities.User;
 import net.engineeringdigest.journalApp.repository.JournalEntryRepo;
 
-@Component // tells @conponentScan that this is a component that can be used by spring ioc
+@Service // tells @conponentScan that this is a component that can be used by spring ioc
            // to make java bean
 public class JournalEntryService {
 
