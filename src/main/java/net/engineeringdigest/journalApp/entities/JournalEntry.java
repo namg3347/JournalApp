@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.engineeringdigest.journalApp.enums.Sentiment;
 
 @Document(collection = "Journal_Entries")//Mongodb feature to mark this call as document  
 @Data//Lombok feature that makes getters,setters,toString,hashcode,equals method during compile time
@@ -24,6 +25,6 @@ public class JournalEntry {
 
     private LocalDateTime date;
 
-    
+    private Sentiment sentiment;
 
 }

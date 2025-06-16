@@ -16,7 +16,8 @@ import net.engineeringdigest.journalApp.repository.JournalCacheRepo;
 public class AppCache {
     
     public enum keys{
-        WEATHER_API;
+        WEATHER_API,
+        LOCATION_API;
     }
 
     public Map<String,String> appCache;

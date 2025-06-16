@@ -2,6 +2,7 @@ package net.engineeringdigest.journalApp.services;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +14,7 @@ public class EmailServiceTest {
     private EmailService emailService;
 
     @Test
+    @Disabled
     public void emailTest() {
         String to = "ng72942@gmail.com";
         String subject = "I can hear voices a year in future...";

@@ -2,6 +2,8 @@ package net.engineeringdigest.journalApp.controllers;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import net.engineeringdigest.journalApp.entities.JournalEntry;
 import net.engineeringdigest.journalApp.entities.User;
 import net.engineeringdigest.journalApp.responseApi.WeatherResponse;
 import net.engineeringdigest.journalApp.services.JournalEntryService;
+import net.engineeringdigest.journalApp.services.LocationService;
 import net.engineeringdigest.journalApp.services.UserEntryService;
 import net.engineeringdigest.journalApp.services.WeatherService;
 
@@ -35,15 +38,19 @@ public class UserController {
     @Autowired
     private WeatherService weatherService;
 
+    @Autowired
+    private LocationService locationService;
+
     @GetMapping
-    public ResponseEntity<?> greeting() {
+    public ResponseEntity<?> greeting(HttpServletRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        WeatherResponse response = weatherService.getWeather("mumbai");
+        String city = locationService.getLocation(request);
+        WeatherResponse response = weatherService.getWeather(city);
         String greeting = "";
         if(response!=null) {
             int temp = response.getCurrent().getFeelslike();
             String airQuality = response.getCurrent().getAirQuality().getPm25();
-            greeting = "It feels like "+temp+" Calcius and the air quality is "+airQuality+" pm2.5.";
+            greeting = "In "+city+",It feels like "+temp+" Calcius and the air quality is "+airQuality+" pm2.5.";
         }
         return new ResponseEntity<>("hi there "+username+"!\n"+greeting,HttpStatus.OK);
    
