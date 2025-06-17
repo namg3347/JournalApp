@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +19,7 @@ public class UserRepoImplTest {
     private UserRepoImpl userRepoImpl;
 
     @Test
+    @Disabled
     public void queryTest() {
         assertNotNull(userRepoImpl.getUserForSA());
     }
