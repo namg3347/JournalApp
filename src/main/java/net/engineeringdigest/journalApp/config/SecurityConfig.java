@@ -1,5 +1,6 @@
 package net.engineeringdigest.journalApp.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -8,21 +9,26 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
+import net.engineeringdigest.journalApp.filter.JwtFilter;
 import net.engineeringdigest.journalApp.services.UserDetailsServiceImpl;
 
 @Configuration // tells @conponentScan that this is a component that can be used by spring ioc
 @EnableWebSecurity
 @RequiredArgsConstructor
 //@Profile("dev") beans can be made using profiles, if profile is dev then it only work for dev env
-public class SecurityConfigDev {
+public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -38,17 +44,15 @@ public class SecurityConfigDev {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeHttpRequests(requests -> requests
-                .antMatchers(HttpMethod.POST,"/user").permitAll()
-                .antMatchers("/user","/journal/**").authenticated()
-                .antMatchers("/admin").hasRole("ADMIN")
-                .anyRequest().permitAll()
-            )
-            .httpBasic()
-            .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and().csrf().disable();
-        return http.build();
+        return http.authorizeHttpRequests(requests -> requests
+                .requestMatchers(HttpMethod.POST,"/user/signup").permitAll()
+                .requestMatchers(HttpMethod.POST,"/user/login").permitAll()
+                .requestMatchers("/user","/journal/**").authenticated()
+                .requestMatchers("/admin").hasRole("ADMIN")
+                .anyRequest().permitAll())
+                .csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean

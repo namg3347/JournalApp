@@ -4,21 +4,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
 import net.engineeringdigest.journalApp.entities.JournalCacheEntity;
 import net.engineeringdigest.journalApp.repository.JournalCacheRepo;
 
 @Component
 public class AppCache {
     
-    public enum keys{
-        WEATHER_API,
-        LOCATION_API;
-    }
+    
 
     public Map<String,String> appCache;
 

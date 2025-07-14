@@ -1,15 +1,15 @@
 package net.engineeringdigest.journalApp.services;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import net.engineeringdigest.journalApp.cache.AppCache;
+import net.engineeringdigest.journalApp.enums.Keys;
 import net.engineeringdigest.journalApp.responseApi.LocationResponse;
 
 @Service
@@ -38,7 +38,7 @@ public class LocationService {
 
     private LocationResponse getLocationFromIP(String ip) {
         try {
-            String finalAPI = appCache.appCache.get(AppCache.keys.LOCATION_API.toString()).replace("<ip>", ip);
+            String finalAPI = appCache.appCache.get(Keys.LOCATION_API.toString()).replace("<ip>", ip);
             ResponseEntity<LocationResponse> responseEntity = restTemplate.exchange(finalAPI, HttpMethod.GET, null,
                     LocationResponse.class);
             return responseEntity.getBody();

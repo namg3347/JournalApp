@@ -2,12 +2,15 @@ package net.engineeringdigest.journalApp.controllers;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import net.engineeringdigest.journalApp.entities.JournalEntry;
 import net.engineeringdigest.journalApp.entities.User;
 import net.engineeringdigest.journalApp.responseApi.WeatherResponse;
@@ -24,9 +29,11 @@ import net.engineeringdigest.journalApp.services.JournalEntryService;
 import net.engineeringdigest.journalApp.services.LocationService;
 import net.engineeringdigest.journalApp.services.UserEntryService;
 import net.engineeringdigest.journalApp.services.WeatherService;
+import net.engineeringdigest.journalApp.utils.JwtUtil;
 
 @RestController
 @RequestMapping("/user")
+@Slf4j
 public class UserController {
 
     @Autowired
@@ -40,6 +47,15 @@ public class UserController {
 
     @Autowired
     private LocationService locationService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @GetMapping
     public ResponseEntity<?> greeting(HttpServletRequest request) {
@@ -56,14 +72,29 @@ public class UserController {
    
     }
 
-    @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user) {
+    @PostMapping("/signup")
+    public ResponseEntity<?> signUp(@RequestBody User user) {
         try {
             userEntryService.saveNewUser(user);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> logIn(@RequestBody User user) {
+        try {
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword()));
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
+            String jwt= jwtUtil.generateToken(userDetails.getUsername());
+            return new ResponseEntity<>(jwt,HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Couldn't generate authorised jwt token", e);
+            return new ResponseEntity<>("Incorrect Username or Password",HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @PutMapping

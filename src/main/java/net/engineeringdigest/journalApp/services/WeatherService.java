@@ -1,6 +1,5 @@
 package net.engineeringdigest.journalApp.services;
 
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import net.engineeringdigest.journalApp.cache.AppCache;
+import net.engineeringdigest.journalApp.enums.Keys;
 import net.engineeringdigest.journalApp.responseApi.WeatherResponse;
 
 @Service
@@ -20,9 +20,6 @@ public class WeatherService {
 
     @Autowired
     private AppCache appCache;
-
-    @Autowired
-    private LocationService locationService;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -36,7 +33,7 @@ public class WeatherService {
             return response;
         }
         else {
-            String finalAPI = appCache.appCache.get(AppCache.keys.WEATHER_API.toString()).replace("<apikey>", apikey ).replace("<city>", city);
+            String finalAPI = appCache.appCache.get(Keys.WEATHER_API.toString()).replace("<apikey>", apikey ).replace("<city>", city);
             ResponseEntity<WeatherResponse> responseEntity =  restTemplate.exchange(finalAPI, HttpMethod.GET, null, WeatherResponse.class);
             WeatherResponse body = responseEntity.getBody();
             if(body !=null) {              
