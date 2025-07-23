@@ -11,14 +11,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import net.engineeringdigest.journalApp.utils.JwtUtil;
 
 import java.io.IOException;
 
 
 @Component
+@Slf4j
 public class JwtFilter  extends OncePerRequestFilter{
     @Autowired
     private UserDetailsService userDetailsService;
@@ -28,16 +31,26 @@ public class JwtFilter  extends OncePerRequestFilter{
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        String authorizationHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
-            username = jwtUtil.extractUsername(jwt);
+        if(request.getCookies()!=null) {
+            for(Cookie cookie: request.getCookies()) {
+                if(cookie.getName().equals("jwt")) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
         }
-        if (username != null) {
+        if(jwt !=null) {
+            try {
+                username = jwtUtil.extractUsername(jwt);
+            } catch (Exception e) {
+                log.error("Invalid jwt token", e);
+            }
+        }
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtUtil.validateToken(jwt)) {
+            if (jwtUtil.validateToken(jwt,userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(auth);

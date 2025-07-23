@@ -4,6 +4,7 @@ import java.util.List;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.engineeringdigest.journalApp.entities.JournalEntry;
 import net.engineeringdigest.journalApp.entities.User;
@@ -51,8 +54,8 @@ public class UserController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    @Value("${jwt.expiration}")
+    private long jwtexpiration;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -83,19 +86,24 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> logIn(@RequestBody User user) {
+    public ResponseEntity<?> logIn(@RequestBody User user,HttpServletRequest request,HttpServletResponse response) {
         try {
             authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword()));
-            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
-            String jwt= jwtUtil.generateToken(userDetails.getUsername());
-            return new ResponseEntity<>(jwt,HttpStatus.OK);
+            Cookie cookie = new Cookie("jwt", jwtUtil.generateToken(user.getUserName()));
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true); 
+            cookie.setPath("/");
+            cookie.setMaxAge((int) (jwtexpiration / 1000));
+            response.addCookie(cookie);
+            return new ResponseEntity<>("login succesful",HttpStatus.OK);
         } catch (Exception e) {
             log.error("Couldn't generate authorised jwt token", e);
             return new ResponseEntity<>("Incorrect Username or Password",HttpStatus.BAD_REQUEST);
         }
-
     }
+
+    
 
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody User newuser) {

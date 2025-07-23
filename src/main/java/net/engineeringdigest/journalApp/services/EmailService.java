@@ -23,7 +23,6 @@ public class EmailService {
             javaMailSender.send(mail);
         } catch (Exception e) {
             log.error("Somthing went wrong while sending email...", e);
-            // TODO: handle exception
         }
     }
 }

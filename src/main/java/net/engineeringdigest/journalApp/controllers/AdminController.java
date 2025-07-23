@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,6 +24,7 @@ public class AdminController {
     @Autowired
     private UserEntryService userEntryService;
     
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all-users")
     public ResponseEntity<?> getAllUsers() {
         List<User> list = userEntryService.getAll();
@@ -32,6 +34,7 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create-admin")
     public ResponseEntity<?> createAdmin(@RequestBody User user ) {
         try {
@@ -42,6 +45,7 @@ public class AdminController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/convert-to-admin/{username}")
     public ResponseEntity<?> convertUserToAdmin(@RequestBody String username) {
         try {
